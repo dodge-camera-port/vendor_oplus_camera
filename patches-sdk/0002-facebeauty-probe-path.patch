@@ -1,0 +1,25 @@
+From 8b29e4c2ebec3e294c69af27723cd26c86991059 Mon Sep 17 00:00:00 2001
+From: realahnet <syedmusicrealise@gmail.com>
+Date: Tue, 30 Jun 2026 14:28:20 +0500
+Subject: [PATCH] facebeauty: probe /system_ext (not /product) for ProductJni
+
+---
+ smali/com/oplus/camera/facebeauty/OplusFaceBeautyPreview.smali | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/smali/com/oplus/camera/facebeauty/OplusFaceBeautyPreview.smali b/smali/com/oplus/camera/facebeauty/OplusFaceBeautyPreview.smali
+index f58791b..fb54177 100644
+--- a/smali/com/oplus/camera/facebeauty/OplusFaceBeautyPreview.smali
++++ b/smali/com/oplus/camera/facebeauty/OplusFaceBeautyPreview.smali
+@@ -16,7 +16,7 @@
+ 
+     const-string v2, "ApsFaceBeautyPreviewProductJni"
+ 
+-    const-string v3, "/product/lib64/libApsFaceBeautyPreviewProductJni.so"
++    const-string v3, "/system_ext/lib64/libApsFaceBeautyPreviewProductJni.so"
+ 
+     if-nez v0, :cond_3
+ 
+-- 
+2.54.0
+
