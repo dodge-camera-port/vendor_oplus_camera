@@ -1,0 +1,56 @@
+From 8635ee4cc9cb62d6711ba76f9d622d76e4c0a579 Mon Sep 17 00:00:00 2001
+From: osm1019 <osm1019@gmail.com>
+Date: Tue, 28 Jul 2026 12:59:24 +0800
+Subject: [PATCH] Unlock 120fps
+
+---
+ .../decision/OperationModeDecision.smali      | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/smali/com/oplus/ocs/camera/producer/decision/OperationModeDecision.smali b/smali/com/oplus/ocs/camera/producer/decision/OperationModeDecision.smali
+index c847071..6a24408 100644
+--- a/smali/com/oplus/ocs/camera/producer/decision/OperationModeDecision.smali
++++ b/smali/com/oplus/ocs/camera/producer/decision/OperationModeDecision.smali
+@@ -243,7 +243,7 @@
+ 
+     move-result v4
+ 
+-    if-eqz v4, :cond_b
++    if-eqz v4, :cond_c
+ 
+     invoke-interface {v1}, Ljava/util/Iterator;->next()Ljava/lang/Object;
+ 
+@@ -433,6 +433,21 @@
+ 
+     .line 113
+     :cond_a
++    const-string v4, "video_120fps"
++
++    invoke-static {v7}, Ljava/lang/String;->valueOf(Ljava/lang/Object;)Ljava/lang/String;
++
++    move-result-object v8
++
++    invoke-virtual {v4, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v4
++
++    if-eqz v4, :cond_b
++
++    goto/16 :goto_0
++
++    :cond_b
+     new-instance p0, Ljava/lang/StringBuilder;
+ 
+     const-string p1, "isFeatureConfigLegal, featureName: "
+@@ -473,7 +488,7 @@
+ 
+     return p0
+ 
+-    :cond_b
++    :cond_c
+     return v2
+ .end method
+ 
+-- 
+2.55.0
+
