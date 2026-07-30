@@ -1,0 +1,130 @@
+From 619698cde6e3c7c4dc6c3e3262a68841f3aae561 Mon Sep 17 00:00:00 2001
+From: Oscar <osm1019@gmail.com>
+Date: Wed, 29 Jul 2026 20:44:36 +0800
+Subject: [PATCH] dodge: Clamp 8K video to 30fps to fix freeze after using
+ 4K120
+
+Enabling real-time 1080p/4K 120fps adds 120 to the rear_main video fps
+allow-list in camera_unit_feature_config.protobuf. That list is per-camera
+and has no per-resolution scoping, so once 120fps is selected at 4K the
+app's fps state stays 120 when switching to 8K. The UI correctly hides the
+120 option and shows "8K-30", but nothing rewrites the stored value.
+
+MediaRecorder is then configured for 7680x4320@120 and the video core
+rejects it:
+
+  msm_vidc_check_core_mbps: Hardware overloaded. needed 15552000, max 7833600
+
+8K is 129600 macroblocks/frame, so the core budget caps it near 60fps and
+120 is roughly 2x over. prepare() fails and the app retries ~23 times over
+~5.5s - that burst is the preview freeze when switching modes, and 8K
+recording fails outright.
+
+Clamp to 30fps at the three points that actually configure the recorder:
+
+  o0.A(II)           setVideoSize runs after setVideoFrameRate, so re-apply
+                     30fps once the 8K width is known; this is the path the
+                     mode switch takes
+  o0.v(profile)      clamp CamcorderProfile.videoFrameRate on entry, which
+                     covers the setProfile branch used when recording
+  ia.i.buildSession  send video_30fps for the session at video_size_8k
+
+1080p120 and 4K120 are untouched - they never reach these branches, and the
+real-time 120fps rate override is left intact. Verified on device: switching
+4K120 -> 8K now logs zero encoder failures (was 23) with no preview stall,
+and 8K30 records.
+
+Update: Same 30fps cap for cond_720p_override
+
+Co-authored-by: Hecheng Yu <kde-yyds@qq.com>
+---
+ smali_classes12/ak/u0.smali | 23 +++++++++++++++++++++++
+ smali_classes28/ja/g.smali  | 22 +++++++++++++++++++---
+ 2 files changed, 42 insertions(+), 3 deletions(-)
+
+diff --git a/smali_classes12/ak/u0.smali b/smali_classes12/ak/u0.smali
+index c8abd1e4..958ecd43 100644
+--- a/smali_classes12/ak/u0.smali
++++ b/smali_classes12/ak/u0.smali
+@@ -618,6 +618,15 @@
+ .method public final A(II)V
+     .locals 2
+ 
++    const/16 v0, 0x500
++    if-eq p1, v0, :do_clamp_size
++    const/16 v0, 0x1e00
++    if-lt p1, v0, :skip_clamp_size
++:do_clamp_size
++    const/16 v0, 0x1e
++    invoke-virtual {p0, v0}, Lak/u0;->y(I)V
++:skip_clamp_size
++
+     .line 1
+     const/4 v0, 0x2
+ 
+@@ -6865,6 +6874,20 @@
+ .method public final v(Landroid/media/CamcorderProfile;)V
+     .locals 3
+ 
++    iget v0, p1, Landroid/media/CamcorderProfile;->videoFrameWidth:I
++
++    const/16 v1, 0x500
++    if-eq v0, v1, :do_clamp_profile
++    const/16 v1, 0x1e00
++    if-lt v0, v1, :skip_clamp_profile
++:do_clamp_profile
++    iget v1, p1, Landroid/media/CamcorderProfile;->videoFrameRate:I
++    const/16 v2, 0x1e
++    if-le v1, v2, :cond_skip_set
++    iput v2, p1, Landroid/media/CamcorderProfile;->videoFrameRate:I
++:cond_skip_set
++:skip_clamp_profile
++
+     .line 1
+     iget v0, p0, Lak/u0;->v:I
+ 
+diff --git a/smali_classes28/ja/g.smali b/smali_classes28/ja/g.smali
+index a9c44d85..b8b08fb2 100644
+--- a/smali_classes28/ja/g.smali
++++ b/smali_classes28/ja/g.smali
+@@ -1869,18 +1869,34 @@
+ 
+     .line 742
+     :goto_10
+-    sget-object v1, Lcom/oplus/ocs/camera/CameraParameter;->VIDEO_FPS:Lcom/oplus/ocs/camera/CameraParameter$ConfigureKey;
+ 
+     .line 743
+     .line 744
+-    move-object/from16 v2, p1
++    invoke-virtual/range {p0 .. p0}, Lja/g;->o1()Ljava/lang/String;
++    move-result-object v1
++    const-string v2, "video_size_8k"
++    invoke-virtual {v2, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++    move-result v1
++    if-eqz v1, :cond_8k_override
++    const-string v12, "video_30fps"
++    :cond_8k_override
+ 
+     .line 745
+     .line 746
+-    check-cast v2, Lyj/p;
++    invoke-virtual/range {p0 .. p0}, Lja/g;->o1()Ljava/lang/String;
++    move-result-object v1
++    const-string v2, "video_size_720p"
++    invoke-virtual {v2, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++    move-result v1
++    if-eqz v1, :cond_720p_override
++    const-string v12, "video_30fps"
++    :cond_720p_override
+ 
+     .line 747
+     .line 748
++    sget-object v1, Lcom/oplus/ocs/camera/CameraParameter;->VIDEO_FPS:Lcom/oplus/ocs/camera/CameraParameter$ConfigureKey;
++    move-object/from16 v2, p1
++    check-cast v2, Lyj/p;
+     invoke-virtual {v2, v1, v12}, Lyj/p;->a(Lcom/oplus/ocs/camera/CameraParameter$ConfigureKey;Ljava/lang/Object;)V
+ 
+     .line 749
+-- 
+2.55.0
+
