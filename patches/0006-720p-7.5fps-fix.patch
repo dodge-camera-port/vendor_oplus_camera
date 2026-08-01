@@ -1,0 +1,38 @@
+From 97dd0979f833d057e4d688428b44e015d11c0115 Mon Sep 17 00:00:00 2001
+From: Hecheng Yu <kde-yyds@qq.com>
+Date: Sat, 1 Aug 2026 14:13:45 +0800
+Subject: [PATCH 4/5] 720p 7.5fps fix
+
+---
+ smali_classes12/com/oplus/camera/module/a.smali | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/smali_classes12/com/oplus/camera/module/a.smali b/smali_classes12/com/oplus/camera/module/a.smali
+index 6c7d9602..2e49da83 100644
+--- a/smali_classes12/com/oplus/camera/module/a.smali
++++ b/smali_classes12/com/oplus/camera/module/a.smali
+@@ -30112,10 +30112,19 @@
+ 
+     invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+ 
+-    move-result v0
++    move-result v1
++
++    if-nez v1, :cond_30fps
++
++    const-string v1, "video_size_720p"
++
++    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v1
+ 
+-    if-eqz v0, :cond_8k
++    if-eqz v1, :cond_8k
+ 
++    :cond_30fps
+     const-wide/high16 v0, 0x403e000000000000L    # 30.0
+ 
+     invoke-static {v0, v1}, Ljava/lang/Double;->valueOf(D)Ljava/lang/Double;
+-- 
+2.55.0
+

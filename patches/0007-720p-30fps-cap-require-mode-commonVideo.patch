@@ -1,0 +1,78 @@
+From f834cdb6f10a29fec511f1dc5cbee4552e810874 Mon Sep 17 00:00:00 2001
+From: Hecheng Yu <kde-yyds@qq.com>
+Date: Sat, 1 Aug 2026 14:26:04 +0800
+Subject: [PATCH 5/5] 720p 30fps cap require mode commonVideo
+
+---
+ smali_classes12/ak/u0.smali | 24 ++++++++++++++++++++++++
+ smali_classes28/ja/g.smali  | 12 ++++++++++++
+ 2 files changed, 36 insertions(+)
+
+diff --git a/smali_classes12/ak/u0.smali b/smali_classes12/ak/u0.smali
+index 4197d719..92c85c2b 100644
+--- a/smali_classes12/ak/u0.smali
++++ b/smali_classes12/ak/u0.smali
+@@ -622,6 +622,18 @@
+ 
+     if-ne p1, v0, :cond_720
+ 
++    invoke-static {}, Lcom/oplus/camera/statistics/DcsUtil;->getCurrentMode()Ljava/lang/String;
++
++    move-result-object v0
++
++    const-string v1, "commonVideo"
++
++    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v0
++
++    if-eqz v0, :cond_720
++
+     const/16 v0, 0x1e
+ 
+     invoke-virtual {p0, v0}, Lak/u0;->y(I)V
+@@ -6889,6 +6901,18 @@
+ 
+     if-ne v0, v1, :cond_720
+ 
++    invoke-static {}, Lcom/oplus/camera/statistics/DcsUtil;->getCurrentMode()Ljava/lang/String;
++
++    move-result-object v2
++
++    const-string v1, "commonVideo"
++
++    invoke-virtual {v2, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v2
++
++    if-eqz v2, :cond_720
++
+     iget v0, p1, Landroid/media/CamcorderProfile;->videoFrameRate:I
+ 
+     const/16 v1, 0x1e
+diff --git a/smali_classes28/ja/g.smali b/smali_classes28/ja/g.smali
+index c833d87e..9455e074 100644
+--- a/smali_classes28/ja/g.smali
++++ b/smali_classes28/ja/g.smali
+@@ -1889,6 +1889,18 @@
+ 
+     if-eqz v2, :cond_24
+ 
++    invoke-static {}, Lcom/oplus/camera/statistics/DcsUtil;->getCurrentMode()Ljava/lang/String;
++
++    move-result-object v1
++
++    const-string v2, "commonVideo"
++
++    invoke-virtual {v1, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v1
++
++    if-eqz v1, :cond_24
++
+     :cond_30fps
+     const-string v12, "video_30fps"
+ 
+-- 
+2.55.0
+

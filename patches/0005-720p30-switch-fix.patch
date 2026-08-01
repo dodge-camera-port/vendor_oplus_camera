@@ -1,0 +1,81 @@
+From 7d3cdb18c14b9b32f58c60e897032a9e86f7637c Mon Sep 17 00:00:00 2001
+From: Hecheng Yu <kde-yyds@qq.com>
+Date: Sat, 1 Aug 2026 14:13:45 +0800
+Subject: [PATCH 3/5] 720p30 switch fix
+
+---
+ smali_classes12/ak/u0.smali | 24 ++++++++++++++++++++++++
+ smali_classes28/ja/g.smali  | 13 +++++++++++--
+ 2 files changed, 35 insertions(+), 2 deletions(-)
+
+diff --git a/smali_classes12/ak/u0.smali b/smali_classes12/ak/u0.smali
+index f7f9913a..4197d719 100644
+--- a/smali_classes12/ak/u0.smali
++++ b/smali_classes12/ak/u0.smali
+@@ -618,6 +618,15 @@
+ .method public final A(II)V
+     .locals 2
+ 
++    const/16 v0, 0x500
++
++    if-ne p1, v0, :cond_720
++
++    const/16 v0, 0x1e
++
++    invoke-virtual {p0, v0}, Lak/u0;->y(I)V
++
++    :cond_720
+     const/16 v0, 0x1e00
+ 
+     if-lt p1, v0, :cond_8k
+@@ -6876,6 +6885,21 @@
+ 
+     iget v0, p1, Landroid/media/CamcorderProfile;->videoFrameWidth:I
+ 
++    const/16 v1, 0x500
++
++    if-ne v0, v1, :cond_720
++
++    iget v0, p1, Landroid/media/CamcorderProfile;->videoFrameRate:I
++
++    const/16 v1, 0x1e
++
++    if-le v0, v1, :cond_720
++
++    iput v1, p1, Landroid/media/CamcorderProfile;->videoFrameRate:I
++
++    :cond_720
++    iget v0, p1, Landroid/media/CamcorderProfile;->videoFrameWidth:I
++
+     const/16 v1, 0x1e00
+ 
+     if-lt v0, v1, :cond_8k
+diff --git a/smali_classes28/ja/g.smali b/smali_classes28/ja/g.smali
+index cd90b8b3..c833d87e 100644
+--- a/smali_classes28/ja/g.smali
++++ b/smali_classes28/ja/g.smali
+@@ -1877,10 +1877,19 @@
+ 
+     invoke-virtual {v2, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+ 
+-    move-result v1
++    move-result v2
++
++    if-nez v2, :cond_30fps
++
++    const-string v2, "video_size_720p"
++
++    invoke-virtual {v2, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v2
+ 
+-    if-eqz v1, :cond_24
++    if-eqz v2, :cond_24
+ 
++    :cond_30fps
+     const-string v12, "video_30fps"
+ 
+     :cond_24
+-- 
+2.55.0
+
