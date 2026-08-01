@@ -1,0 +1,73 @@
+From 6bd62c238e5819d0348e329c0519e6c6f69cb583 Mon Sep 17 00:00:00 2001
+From: Hecheng Yu <kde-yyds@qq.com>
+Date: Sat, 1 Aug 2026 14:03:10 +0800
+Subject: [PATCH 4/7] dodge: Clamp 8K capture rate to 30fps to fix 7.5fps
+ recording
+
+After the 4K120 -> 8K switch, the recorder is configured with captureRate=120
+while the encoder outputs at 30fps (log: "ISConfig timeLapse 120fps as 30fps").
+The input surface is told to deliver 120fps but the sensor only produces
+30fps for 8K, so each 1/30s real frame is stretched to 1/120s of media time:
+the recorded file plays at 7.5fps, exactly 4x slow motion (120/30).
+
+The capture rate comes from CommonVideoMode.li():
+
+  public Double li() {
+      if (r()) return 120.0;   // r() == (120 == uj()), the stale fps state
+      return Cj() ? 60.0 : 30.0;
+  }
+
+r() reads the stored fps value, which stays 120 after switching from 4K120,
+so MediaRecorder.setCaptureRate(120) is sent even though 8K only supports
+30fps. On OxygenOS 16.0.8.301 the native encoder now honors the time-lapse
+hint; older builds ignored it, which is why this only regressed on the new
+base.
+
+Clamp li() to return 30.0 whenever the video size is 8K, before the fps-state
+check runs:
+
+  com/oplus/camera/module/a.li()  if G6() == "video_size_8k" return 30.0
+
+8K capture rate is now 30fps, matching the sensor, so the muxer timestamps
+land at the correct cadence and the file plays back at 30fps. 1080p120/4K120
+never hit this branch and keep their real-time override.
+---
+ .../com/oplus/camera/module/a.smali           | 21 +++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/smali_classes12/com/oplus/camera/module/a.smali b/smali_classes12/com/oplus/camera/module/a.smali
+index cb9001d..6c7d960 100644
+--- a/smali_classes12/com/oplus/camera/module/a.smali
++++ b/smali_classes12/com/oplus/camera/module/a.smali
+@@ -30104,7 +30104,28 @@
+ .method public final li()Ljava/lang/Double;
+     .locals 2
+ 
++    invoke-virtual {p0}, Lck/u0;->G6()Ljava/lang/String;
++
++    move-result-object v0
++
++    const-string v1, "video_size_8k"
++
++    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v0
++
++    if-eqz v0, :cond_8k
++
++    const-wide/high16 v0, 0x403e000000000000L    # 30.0
++
++    invoke-static {v0, v1}, Ljava/lang/Double;->valueOf(D)Ljava/lang/Double;
++
++    move-result-object p0
++
++    return-object p0
++
+     .line 1
++    :cond_8k
+     invoke-virtual {p0}, Lcom/oplus/camera/module/a;->r()Z
+ 
+     .line 2
+-- 
+2.55.0
+

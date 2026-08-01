@@ -1,14 +1,28 @@
-From 97dd0979f833d057e4d688428b44e015d11c0115 Mon Sep 17 00:00:00 2001
+From eae89ff4541c03d75bedeaf5637f6910c733ee62 Mon Sep 17 00:00:00 2001
 From: Hecheng Yu <kde-yyds@qq.com>
 Date: Sat, 1 Aug 2026 14:13:45 +0800
-Subject: [PATCH 4/5] 720p 7.5fps fix
+Subject: [PATCH 6/7] dodge: Clamp 720p capture rate to 30fps to fix 7.5fps
+ recording
 
+The 4x-slow-motion problem of the 8K fix applies to 720p as well: after
+switching 4K120 -> 720p, CommonVideoMode.li() returns 120.0 (stale fps
+state) and MediaRecorder.setCaptureRate(120) is sent while the encoder
+outputs 30fps, producing a file that plays at 7.5fps (120/30).
+
+Extend the li() clamp so it also returns 30.0 when the video size is 720p:
+
+  com/oplus/camera/module/a.li()  if G6() == "video_size_8k"  return 30.0
+                                  if G6() == "video_size_720p" return 30.0
+
+With this, 720p30 records at the correct 30fps cadence. 1080p120/4K120
+still bypass the clamp. Only required on OxygenOS 16.0.8.301 and later,
+where the native encoder honors the time-lapse capture rate.
 ---
  smali_classes12/com/oplus/camera/module/a.smali | 13 +++++++++++--
  1 file changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/smali_classes12/com/oplus/camera/module/a.smali b/smali_classes12/com/oplus/camera/module/a.smali
-index 6c7d9602..2e49da83 100644
+index 6c7d960..2e49da8 100644
 --- a/smali_classes12/com/oplus/camera/module/a.smali
 +++ b/smali_classes12/com/oplus/camera/module/a.smali
 @@ -30112,10 +30112,19 @@

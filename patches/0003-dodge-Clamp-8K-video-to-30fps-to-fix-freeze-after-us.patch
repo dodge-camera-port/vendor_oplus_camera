@@ -1,7 +1,8 @@
-From 1b18d8cd3cd212453d4f3fbcb0b4f88fa7fe753c Mon Sep 17 00:00:00 2001
+From a634e66c9fc9f34f1506cec97d925c4d2121a408 Mon Sep 17 00:00:00 2001
 From: Oscar <osm1019@gmail.com>
 Date: Sat, 1 Aug 2026 11:14:10 +0800
-Subject: [PATCH 1/5] dodge: Clamp 8K video to 30fps to fix freeze after using 4K120
+Subject: [PATCH 3/7] dodge: Clamp 8K video to 30fps to fix freeze after using
+ 4K120
 
 Enabling real-time 1080p/4K 120fps adds 120 to the rear_main video fps
 allow-list in camera_unit_feature_config.protobuf. That list is per-camera
@@ -19,27 +20,32 @@ rejects it:
 ~5.5s - that burst is the preview freeze when switching modes, and 8K
 recording fails outright.
 
-Clamp to 30fps at the three points that actually configure the recorder:
+Clamp to 30fps at the three points that actually configure the recorder
+(obfuscated names from this build):
 
-  o0.A(II)           setVideoSize runs after setVideoFrameRate, so re-apply
-                     30fps once the 8K width is known; this is the path the
-                     mode switch takes
-  o0.v(profile)      clamp CamcorderProfile.videoFrameRate on entry, which
-                     covers the setProfile branch used when recording
-  ia.i.buildSession  send video_30fps for the session at video_size_8k
+  u0.A(II)                 setVideoSize runs after setVideoFrameRate, so
+                           re-apply 30fps once the 8K width is known; this
+                           is the path the mode switch takes
+  u0.v(CamcorderProfile)   clamp profile.videoFrameRate on entry, which
+                           covers the setProfile branch used when recording
+  g.buildSession           send video_30fps for the session at
+                           video_size_8k (FPSPresenter)
 
 1080p120 and 4K120 are untouched - they never reach these branches, and the
 real-time 120fps rate override is left intact. Verified on device: switching
 4K120 -> 8K now logs zero encoder failures (was 23) with no preview stall,
 and 8K30 records.
 
+This patch is the only one required on older OxygenOS releases; the 7.5fps
+and 720p issues appear with OxygenOS 16.0.8.301 and are covered by the
+following patches.
 ---
  smali_classes12/ak/u0.smali | 24 ++++++++++++++++++++++++
  smali_classes28/ja/g.smali  | 15 +++++++++++++++
  2 files changed, 39 insertions(+)
 
 diff --git a/smali_classes12/ak/u0.smali b/smali_classes12/ak/u0.smali
-index c8abd1e4..f7f9913a 100644
+index c8abd1e..f7f9913 100644
 --- a/smali_classes12/ak/u0.smali
 +++ b/smali_classes12/ak/u0.smali
 @@ -618,7 +618,16 @@
@@ -83,7 +89,7 @@ index c8abd1e4..f7f9913a 100644
  
      .line 2
 diff --git a/smali_classes28/ja/g.smali b/smali_classes28/ja/g.smali
-index a9c44d85..cd90b8b3 100644
+index a9c44d8..cd90b8b 100644
 --- a/smali_classes28/ja/g.smali
 +++ b/smali_classes28/ja/g.smali
 @@ -1869,6 +1869,21 @@

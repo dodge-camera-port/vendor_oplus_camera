@@ -1,14 +1,14 @@
-From 9a5a7fa508ee677ebb0a42caba0c573ea05f8e2b Mon Sep 17 00:00:00 2001
+From 87afad3590e25e352a0d037f33da5b0b2c7afcfd Mon Sep 17 00:00:00 2001
 From: Hecheng Yu <kde-yyds@qq.com>
 Date: Thu, 11 Jun 2026 14:44:06 +0800
-Subject: [PATCH 2/2] manifest: Get rid of oplus permissions
+Subject: [PATCH 2/7] manifest: Get rid of oplus permissions
 
 ---
  AndroidManifest.xml | 68 ++++++++++++++++++++++-----------------------
  1 file changed, 34 insertions(+), 34 deletions(-)
 
 diff --git a/AndroidManifest.xml b/AndroidManifest.xml
-index ae3e81a2..2c5f20cc 100644
+index ae3e81a..2c5f20c 100644
 --- a/AndroidManifest.xml
 +++ b/AndroidManifest.xml
 @@ -260,7 +260,7 @@
@@ -252,5 +252,5 @@ index ae3e81a2..2c5f20cc 100644
 \ No newline at end of file
 +</manifest>
 -- 
-2.54.0
+2.55.0
 

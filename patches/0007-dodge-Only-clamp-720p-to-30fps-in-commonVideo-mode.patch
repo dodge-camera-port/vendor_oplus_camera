@@ -1,15 +1,35 @@
-From f834cdb6f10a29fec511f1dc5cbee4552e810874 Mon Sep 17 00:00:00 2001
+From b061b8c6af0b7696a02e77dd77a6c31ee139133d Mon Sep 17 00:00:00 2001
 From: Hecheng Yu <kde-yyds@qq.com>
 Date: Sat, 1 Aug 2026 14:26:04 +0800
-Subject: [PATCH 5/5] 720p 30fps cap require mode commonVideo
+Subject: [PATCH 7/7] dodge: Only clamp 720p to 30fps in commonVideo mode
 
+The 720p cap from the previous patches is keyed purely on the 1280 width /
+"video_size_720p" string, but slow motion also records at 720p - at
+240/480fps. Those resolutions share the same 1280 width, so the 30fps clamp
+was breaking 720p 240/480fps slow motion on OxygenOS 16.0.8.301.
+
+Gate every 720p cap on the current capture mode being "commonVideo":
+
+  DcsUtil.getCurrentMode() == "commonVideo"
+
+applied at:
+
+  u0.A(II)                  only re-apply 30fps at 1280 width in commonVideo
+  u0.v(CamcorderProfile)    only clamp profile to 30 at 1280 width in
+                            commonVideo
+  g.buildSession            only send video_30fps for video_size_720p in
+                            commonVideo
+
+The 8K caps are left ungated: 8K slow motion does not exist, so there is no
+width collision. Result: 720p30 works when coming from 4K120 in normal
+video mode, and 720p 240/480fps slow motion is unaffected.
 ---
  smali_classes12/ak/u0.smali | 24 ++++++++++++++++++++++++
  smali_classes28/ja/g.smali  | 12 ++++++++++++
  2 files changed, 36 insertions(+)
 
 diff --git a/smali_classes12/ak/u0.smali b/smali_classes12/ak/u0.smali
-index 4197d719..92c85c2b 100644
+index 4197d71..92c85c2 100644
 --- a/smali_classes12/ak/u0.smali
 +++ b/smali_classes12/ak/u0.smali
 @@ -622,6 +622,18 @@
@@ -51,7 +71,7 @@ index 4197d719..92c85c2b 100644
  
      const/16 v1, 0x1e
 diff --git a/smali_classes28/ja/g.smali b/smali_classes28/ja/g.smali
-index c833d87e..9455e074 100644
+index c833d87..9455e07 100644
 --- a/smali_classes28/ja/g.smali
 +++ b/smali_classes28/ja/g.smali
 @@ -1889,6 +1889,18 @@

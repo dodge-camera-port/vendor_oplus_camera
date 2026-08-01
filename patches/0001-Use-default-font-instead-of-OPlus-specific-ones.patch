@@ -1,14 +1,14 @@
-From 39ce6103094fe97d9f37e3ec85c02c41d45873d4 Mon Sep 17 00:00:00 2001
+From f0c359ced1261dc832eea419546d426d353ba269 Mon Sep 17 00:00:00 2001
 From: Hecheng Yu <kde-yyds@qq.com>
 Date: Mon, 29 Jun 2026 22:30:15 +0800
-Subject: [PATCH 1/2] Use default font instead of OPlus specific ones
+Subject: [PATCH 1/7] Use default font instead of OPlus specific ones
 
 ---
  smali/t7/u3.smali | 293 +---------------------------------------------
  1 file changed, 3 insertions(+), 290 deletions(-)
 
 diff --git a/smali/t7/u3.smali b/smali/t7/u3.smali
-index 126551b8..5383d7af 100644
+index 126551b..5383d7a 100644
 --- a/smali/t7/u3.smali
 +++ b/smali/t7/u3.smali
 @@ -263,300 +263,13 @@
@@ -316,5 +316,5 @@ index 126551b8..5383d7af 100644
  
  .method public static b()Landroid/graphics/Typeface;
 -- 
-2.54.0
+2.55.0
 
