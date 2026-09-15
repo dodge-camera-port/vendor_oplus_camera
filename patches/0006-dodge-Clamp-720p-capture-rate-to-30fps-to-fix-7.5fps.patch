@@ -1,6 +1,6 @@
-From eae89ff4541c03d75bedeaf5637f6910c733ee62 Mon Sep 17 00:00:00 2001
+From 71625186b8373e2795fabf5b3cfe6d6a9564a459 Mon Sep 17 00:00:00 2001
 From: Hecheng Yu <kde-yyds@qq.com>
-Date: Sat, 1 Aug 2026 14:13:45 +0800
+Date: Sun, 13 Sep 2026 21:06:15 +0800
 Subject: [PATCH 6/7] dodge: Clamp 720p capture rate to 30fps to fix 7.5fps
  recording
 
@@ -22,10 +22,10 @@ where the native encoder honors the time-lapse capture rate.
  1 file changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/smali_classes12/com/oplus/camera/module/a.smali b/smali_classes12/com/oplus/camera/module/a.smali
-index 6c7d960..2e49da8 100644
+index a36d2d7..8024be7 100644
 --- a/smali_classes12/com/oplus/camera/module/a.smali
 +++ b/smali_classes12/com/oplus/camera/module/a.smali
-@@ -30112,10 +30112,19 @@
+@@ -31918,10 +31918,19 @@
  
      invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  

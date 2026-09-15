@@ -1,6 +1,6 @@
-From b061b8c6af0b7696a02e77dd77a6c31ee139133d Mon Sep 17 00:00:00 2001
+From 7153f6539e96cee5457870c1c5b6076e60e32bcc Mon Sep 17 00:00:00 2001
 From: Hecheng Yu <kde-yyds@qq.com>
-Date: Sat, 1 Aug 2026 14:26:04 +0800
+Date: Sun, 13 Sep 2026 21:06:27 +0800
 Subject: [PATCH 7/7] dodge: Only clamp 720p to 30fps in commonVideo mode
 
 The 720p cap from the previous patches is keyed purely on the 1280 width /
@@ -24,14 +24,14 @@ The 8K caps are left ungated: 8K slow motion does not exist, so there is no
 width collision. Result: 720p30 works when coming from 4K120 in normal
 video mode, and 720p 240/480fps slow motion is unaffected.
 ---
- smali_classes12/ak/u0.smali | 24 ++++++++++++++++++++++++
- smali_classes28/ja/g.smali  | 12 ++++++++++++
+ smali_classes12/ck/u0.smali | 24 ++++++++++++++++++++++++
+ smali_classes29/la/e.smali  | 12 ++++++++++++
  2 files changed, 36 insertions(+)
 
-diff --git a/smali_classes12/ak/u0.smali b/smali_classes12/ak/u0.smali
-index 4197d71..92c85c2 100644
---- a/smali_classes12/ak/u0.smali
-+++ b/smali_classes12/ak/u0.smali
+diff --git a/smali_classes12/ck/u0.smali b/smali_classes12/ck/u0.smali
+index acd699f..fe9b74d 100644
+--- a/smali_classes12/ck/u0.smali
++++ b/smali_classes12/ck/u0.smali
 @@ -622,6 +622,18 @@
  
      if-ne p1, v0, :cond_720
@@ -50,8 +50,8 @@ index 4197d71..92c85c2 100644
 +
      const/16 v0, 0x1e
  
-     invoke-virtual {p0, v0}, Lak/u0;->y(I)V
-@@ -6889,6 +6901,18 @@
+     invoke-virtual {p0, v0}, Lck/u0;->y(I)V
+@@ -6891,6 +6903,18 @@
  
      if-ne v0, v1, :cond_720
  
@@ -70,13 +70,13 @@ index 4197d71..92c85c2 100644
      iget v0, p1, Landroid/media/CamcorderProfile;->videoFrameRate:I
  
      const/16 v1, 0x1e
-diff --git a/smali_classes28/ja/g.smali b/smali_classes28/ja/g.smali
-index c833d87..9455e07 100644
---- a/smali_classes28/ja/g.smali
-+++ b/smali_classes28/ja/g.smali
-@@ -1889,6 +1889,18 @@
+diff --git a/smali_classes29/la/e.smali b/smali_classes29/la/e.smali
+index e2a3fa8..4726700 100644
+--- a/smali_classes29/la/e.smali
++++ b/smali_classes29/la/e.smali
+@@ -1897,6 +1897,18 @@
  
-     if-eqz v2, :cond_24
+     if-eqz v2, :cond_8k
  
 +    invoke-static {}, Lcom/oplus/camera/statistics/DcsUtil;->getCurrentMode()Ljava/lang/String;
 +
@@ -88,7 +88,7 @@ index c833d87..9455e07 100644
 +
 +    move-result v1
 +
-+    if-eqz v1, :cond_24
++    if-eqz v1, :cond_8k
 +
      :cond_30fps
      const-string v12, "video_30fps"

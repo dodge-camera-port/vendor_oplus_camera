@@ -1,6 +1,6 @@
-From a634e66c9fc9f34f1506cec97d925c4d2121a408 Mon Sep 17 00:00:00 2001
+From 458daecda93b23a14fc78e10e6cced98393f9b51 Mon Sep 17 00:00:00 2001
 From: Oscar <osm1019@gmail.com>
-Date: Sat, 1 Aug 2026 11:14:10 +0800
+Date: Sun, 13 Sep 2026 21:05:07 +0800
 Subject: [PATCH 3/7] dodge: Clamp 8K video to 30fps to fix freeze after using
  4K120
 
@@ -40,14 +40,14 @@ This patch is the only one required on older OxygenOS releases; the 7.5fps
 and 720p issues appear with OxygenOS 16.0.8.301 and are covered by the
 following patches.
 ---
- smali_classes12/ak/u0.smali | 24 ++++++++++++++++++++++++
- smali_classes28/ja/g.smali  | 15 +++++++++++++++
+ smali_classes12/ck/u0.smali | 24 ++++++++++++++++++++++++
+ smali_classes29/la/e.smali  | 15 +++++++++++++++
  2 files changed, 39 insertions(+)
 
-diff --git a/smali_classes12/ak/u0.smali b/smali_classes12/ak/u0.smali
-index c8abd1e..f7f9913 100644
---- a/smali_classes12/ak/u0.smali
-+++ b/smali_classes12/ak/u0.smali
+diff --git a/smali_classes12/ck/u0.smali b/smali_classes12/ck/u0.smali
+index 54aed8f..df325e3 100644
+--- a/smali_classes12/ck/u0.smali
++++ b/smali_classes12/ck/u0.smali
 @@ -618,7 +618,16 @@
  .method public final A(II)V
      .locals 2
@@ -58,14 +58,14 @@ index c8abd1e..f7f9913 100644
 +
 +    const/16 v0, 0x1e
 +
-+    invoke-virtual {p0, v0}, Lak/u0;->y(I)V
++    invoke-virtual {p0, v0}, Lck/u0;->y(I)V
 +
      .line 1
 +    :cond_8k
      const/4 v0, 0x2
  
      .line 2
-@@ -6865,7 +6874,22 @@
+@@ -6867,7 +6876,22 @@
  .method public final v(Landroid/media/CamcorderProfile;)V
      .locals 3
  
@@ -85,18 +85,18 @@ index c8abd1e..f7f9913 100644
 +
      .line 1
 +    :cond_8k
-     iget v0, p0, Lak/u0;->v:I
+     iget v0, p0, Lck/u0;->v:I
  
      .line 2
-diff --git a/smali_classes28/ja/g.smali b/smali_classes28/ja/g.smali
-index a9c44d8..cd90b8b 100644
---- a/smali_classes28/ja/g.smali
-+++ b/smali_classes28/ja/g.smali
-@@ -1869,6 +1869,21 @@
+diff --git a/smali_classes29/la/e.smali b/smali_classes29/la/e.smali
+index f74b912..bd83ea7 100644
+--- a/smali_classes29/la/e.smali
++++ b/smali_classes29/la/e.smali
+@@ -1877,6 +1877,21 @@
  
-     .line 742
-     :goto_10
-+    invoke-virtual/range {p0 .. p0}, Lja/g;->o1()Ljava/lang/String;
+     .line 745
+     :goto_11
++    invoke-virtual/range {p0 .. p0}, Lla/e;->p1()Ljava/lang/String;
 +
 +    move-result-object v1
 +
@@ -106,14 +106,14 @@ index a9c44d8..cd90b8b 100644
 +
 +    move-result v1
 +
-+    if-eqz v1, :cond_24
++    if-eqz v1, :cond_8k
 +
 +    const-string v12, "video_30fps"
 +
-+    :cond_24
++    :cond_8k
      sget-object v1, Lcom/oplus/ocs/camera/CameraParameter;->VIDEO_FPS:Lcom/oplus/ocs/camera/CameraParameter$ConfigureKey;
  
-     .line 743
+     .line 746
 -- 
 2.55.0
 

@@ -1,25 +1,22 @@
-From 2ed97453ba38c9e83de6980005c74763b791250a Mon Sep 17 00:00:00 2001
+From 20130645fb9df6e11af56f488910166fd488d2dc Mon Sep 17 00:00:00 2001
 From: Hecheng Yu <kde-yyds@qq.com>
-Date: Wed, 1 Jul 2026 17:01:28 +0800
-Subject: [PATCH] Enable Live Photo
+Date: Sun, 13 Sep 2026 21:24:26 +0800
+Subject: [PATCH 3/3] Enable Live Photo
 
 ---
- .../com/oplus/aiunit/vision/c25.smali         | 85 ++++++++++++++++++-
- 1 file changed, 84 insertions(+), 1 deletion(-)
+ smali/com/oplus/aiunit/vision/b39.smali | 115 +++++++++++++++++++++++-
+ 1 file changed, 113 insertions(+), 2 deletions(-)
 
-diff --git a/smali_classes8/com/oplus/aiunit/vision/c25.smali b/smali_classes8/com/oplus/aiunit/vision/c25.smali
-index 518937782..9ed76c7f4 100644
---- a/smali_classes8/com/oplus/aiunit/vision/c25.smali
-+++ b/smali_classes8/com/oplus/aiunit/vision/c25.smali
-@@ -219,13 +219,16 @@
+diff --git a/smali/com/oplus/aiunit/vision/b39.smali b/smali/com/oplus/aiunit/vision/b39.smali
+index 0d38faa..0d91743 100644
+--- a/smali/com/oplus/aiunit/vision/b39.smali
++++ b/smali/com/oplus/aiunit/vision/b39.smali
+@@ -193,10 +193,13 @@
  .end method
  
  .method public static final c(Ljava/lang/String;ZZ)Z
 -    .locals 3
 +    .locals 4
-     .annotation build Lkotlin/jvm/JvmOverloads;
-     .end annotation
- 
      .annotation runtime Lkotlin/jvm/JvmStatic;
      .end annotation
  
@@ -29,13 +26,25 @@ index 518937782..9ed76c7f4 100644
      .line 1
      const-string v0, "configId"
  
-@@ -396,7 +399,87 @@
-     .line 70
-     .line 71
-     :goto_5
+@@ -319,7 +322,9 @@
+     .line 50
+     .line 51
+     .line 52
+-    return p1
++    move p2, p1
++
++    goto :goto_5
+ 
+     .line 53
+     :goto_4
+@@ -355,7 +360,113 @@
+     .line 64
+     .line 65
+     .line 66
 +    # -------------------------------------------------------------
 +    #  Log original result (optional, remove if not needed)
 +    # -------------------------------------------------------------
++    :goto_5
 +    const-string v0, "GalleryHook"
 +
 +    new-instance v1, Ljava/lang/StringBuilder;
@@ -72,51 +81,76 @@ index 518937782..9ed76c7f4 100644
 +    #  Override for Olive keys (now using if-nez)
 +    # -------------------------------------------------------------
 +    const-string v0, "feature_is_support_olive"
++
 +    invoke-virtual {v0, v3}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
 +    move-result v1
++
 +    if-nez v1, :cond_olive_enabled
 +
 +    const-string v0, "feature_is_support_olive_slide_play"
++
 +    invoke-virtual {v0, v3}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
 +    move-result v1
++
 +    if-nez v1, :cond_olive_enabled
 +
 +    const-string v0, "feature_is_support_video_extract_olive"
++
 +    invoke-virtual {v0, v3}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
 +    move-result v1
++
 +    if-nez v1, :cond_olive_enabled
 +
 +    const-string v0, "feature_olive_slow_motion_recommend_popup_shown"
++
 +    invoke-virtual {v0, v3}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
 +    move-result v1
++
 +    if-nez v1, :cond_olive_enabled
 +
-+    # Not an Olive key – return original result
++    # Not an Olive key - return original result
      return p2
 +
 +    :cond_olive_enabled
 +    # Override: return true
 +    const-string v0, "GalleryHook"
++
 +    new-instance v1, Ljava/lang/StringBuilder;
++
 +    invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
++
 +    const-string v2, "OVERRIDE: "
++
 +    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++
 +    move-result-object v1
++
 +    invoke-virtual {v1, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++
 +    move-result-object v1
++
 +    const-string v2, " -> true"
++
 +    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++
 +    move-result-object v1
++
 +    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
++
 +    move-result-object v1
++
 +    invoke-static {v0, v1}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
 +
 +    const/4 v0, 0x1
-+    return v0
 +
++    return v0
  .end method
  
- .method public static synthetic d(Ljava/lang/String;ZI)Z
+ .method public static synthetic d(ILjava/lang/String;Z)Z
 -- 
-2.54.0
+2.55.0
 

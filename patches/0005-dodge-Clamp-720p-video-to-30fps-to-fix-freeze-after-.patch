@@ -1,6 +1,6 @@
-From 29397e431a85ef1087fbc6e660dc242b0208e7ae Mon Sep 17 00:00:00 2001
+From 44868094771674abdc2310bb4ea0e401590a5c6f Mon Sep 17 00:00:00 2001
 From: Hecheng Yu <kde-yyds@qq.com>
-Date: Sat, 1 Aug 2026 14:13:45 +0800
+Date: Sun, 13 Sep 2026 21:06:06 +0800
 Subject: [PATCH 5/7] dodge: Clamp 720p video to 30fps to fix freeze after
  using 4K120
 
@@ -24,14 +24,14 @@ still untouched. After this patch, 720p30 records cleanly when coming from
 Note: the 720p cap is intentionally mode-gated to commonVideo only; without
 that, 720p 240/480fps slow motion would be broken (see the last patch).
 ---
- smali_classes12/ak/u0.smali | 24 ++++++++++++++++++++++++
- smali_classes28/ja/g.smali  | 13 +++++++++++--
+ smali_classes12/ck/u0.smali | 24 ++++++++++++++++++++++++
+ smali_classes29/la/e.smali  | 13 +++++++++++--
  2 files changed, 35 insertions(+), 2 deletions(-)
 
-diff --git a/smali_classes12/ak/u0.smali b/smali_classes12/ak/u0.smali
-index f7f9913..4197d71 100644
---- a/smali_classes12/ak/u0.smali
-+++ b/smali_classes12/ak/u0.smali
+diff --git a/smali_classes12/ck/u0.smali b/smali_classes12/ck/u0.smali
+index df325e3..acd699f 100644
+--- a/smali_classes12/ck/u0.smali
++++ b/smali_classes12/ck/u0.smali
 @@ -618,6 +618,15 @@
  .method public final A(II)V
      .locals 2
@@ -42,13 +42,13 @@ index f7f9913..4197d71 100644
 +
 +    const/16 v0, 0x1e
 +
-+    invoke-virtual {p0, v0}, Lak/u0;->y(I)V
++    invoke-virtual {p0, v0}, Lck/u0;->y(I)V
 +
 +    :cond_720
      const/16 v0, 0x1e00
  
      if-lt p1, v0, :cond_8k
-@@ -6876,6 +6885,21 @@
+@@ -6878,6 +6887,21 @@
  
      iget v0, p1, Landroid/media/CamcorderProfile;->videoFrameWidth:I
  
@@ -70,11 +70,11 @@ index f7f9913..4197d71 100644
      const/16 v1, 0x1e00
  
      if-lt v0, v1, :cond_8k
-diff --git a/smali_classes28/ja/g.smali b/smali_classes28/ja/g.smali
-index cd90b8b..c833d87 100644
---- a/smali_classes28/ja/g.smali
-+++ b/smali_classes28/ja/g.smali
-@@ -1877,10 +1877,19 @@
+diff --git a/smali_classes29/la/e.smali b/smali_classes29/la/e.smali
+index bd83ea7..e2a3fa8 100644
+--- a/smali_classes29/la/e.smali
++++ b/smali_classes29/la/e.smali
+@@ -1885,10 +1885,19 @@
  
      invoke-virtual {v2, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
@@ -89,13 +89,13 @@ index cd90b8b..c833d87 100644
 +
 +    move-result v2
  
--    if-eqz v1, :cond_24
-+    if-eqz v2, :cond_24
+-    if-eqz v1, :cond_8k
++    if-eqz v2, :cond_8k
  
 +    :cond_30fps
      const-string v12, "video_30fps"
  
-     :cond_24
+     :cond_8k
 -- 
 2.55.0
 
